@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratoriya tahlil natijalari</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1 data-i18n="appTitle">Laboratoriya tahlil natijalari</h1>
+                <div class="language-selector">
+                    <label for="languageSelect" data-i18n="language">Til:</label>
+                    <select id="languageSelect">
+                        <option value="uz">O'zbek</option>
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+        
+        <main>
+            <!-- Login Section (shown when not authenticated) -->
+            <div id="loginSection" class="section">
+                <div class="card">
+                    <h2 data-i18n="login">Kirish</h2>
+                    <p class="instructions" data-i18n="loginInstructions">Telegram botga xabar yuboring va tasdiqlash kodini oling, keyin uni quyida kiriting.</p>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="verificationCode" data-i18n="verificationCode">Tasdiqlash kodi:</label>
+                            <input type="text" id="verificationCode" name="code" required
+                                   data-i18n-placeholder="enterCodePlaceholder" placeholder="6 raqamli kodni kiriting" maxlength="6" pattern="[0-9]{6}">
+                        </div>
+                        <button type="submit" data-i18n="verifyLogin">Tasdiqlash va kirish</button>
+                    </form>
+                    <div id="loginError" class="error hidden"></div>
+                </div>
+            </div>
+
+            <!-- Results Section (shown when authenticated) -->
+            <div id="resultsSection" class="section hidden">
+                <div class="card">
+                    <div class="user-info">
+                        <span>Kirgan: <strong id="userName"></strong></span>
+                        <button id="logoutBtn" class="logout-btn">Chiqish</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 data-i18n="searchResults">Natijalarni qidirish</h2>
+                    <form id="searchForm">
+                        <div class="form-group">
+                            <label for="patientPhone" data-i18n="patientPhone">Bemor telefon raqami:</label>
+                            <input type="tel" id="patientPhone" name="patientPhone" required
+                                   data-i18n-placeholder="phonePlaceholder" placeholder="+1234567890">
+                        </div>
+                        <div class="form-group">
+                            <label for="date" data-i18n="dateOptional">Sana (ixtiyoriy):</label>
+                            <input type="date" id="date" name="date">
+                        </div>
+                        <button type="submit" data-i18n="search">Qidirish</button>
+                    </form>
+                </div>
+                
+                <div id="resultsContainer" class="card hidden">
+                    <h2 data-i18n="results">Natijalar</h2>
+                    <div id="resultsList"></div>
+                </div>
+                
+                <div id="errorMessage" class="error hidden"></div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+

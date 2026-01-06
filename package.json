@@ -1,0 +1,19 @@
+{
+  "name": "analysis-results",
+  "version": "1.0.0",
+  "description": "Laboratory analysis results checker with Telegram authentication",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step needed'"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
+
+
+
