@@ -127,9 +127,9 @@ The application uses vanilla HTML/CSS/JavaScript frontend with Netlify Functions
 
 Required in Netlify Dashboard:
 
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_REGION`
+- `MY_AWS_ACCESS_KEY_ID`
+- `MY_AWS_SECRET_ACCESS_KEY`
+- `MY_AWS_REGION`
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_WEBHOOK_SECRET` (optional, for webhook security)
 
