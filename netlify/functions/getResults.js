@@ -15,7 +15,7 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+        'Access-Control-Allow-Methods': 'GET, OPTIONS'
     };
 
     if (event.httpMethod === 'OPTIONS') {
@@ -23,41 +23,34 @@ exports.handler = async (event) => {
     }
 
     try {
-        const { patientPhone, date } = JSON.parse(event.body || '{}');
+        // Get user phone from Authorization header (set by client)
+        const authHeader = event.headers.authorization || event.headers.Authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return {
+                statusCode: 401,
+                headers,
+                body: JSON.stringify({ error: 'Authorization required' })
+            };
+        }
+
+        const patientPhone = authHeader.substring(7); // Remove 'Bearer ' prefix
 
         if (!patientPhone) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: 'PatientPhone is required' })
+                body: JSON.stringify({ error: 'Patient phone not provided' })
             };
         }
 
-        let command;
-
-        if (date) {
-            // Query specific date
-            command = new QueryCommand({
-                TableName: 'AnalysisResult',
-                KeyConditionExpression: 'PatientPhone = :phone AND #date = :date',
-                ExpressionAttributeNames: {
-                    '#date': 'date'
-                },
-                ExpressionAttributeValues: {
-                    ':phone': patientPhone,
-                    ':date': date
-                }
-            });
-        } else {
-            // Query all dates for this patient
-            command = new QueryCommand({
-                TableName: 'AnalysisResult',
-                KeyConditionExpression: 'PatientPhone = :phone',
-                ExpressionAttributeValues: {
-                    ':phone': patientPhone
-                }
-            });
-        }
+        // Query all results for this patient's phone number
+        const command = new QueryCommand({
+            TableName: 'AnalysisResult',
+            KeyConditionExpression: 'PatientPhone = :phone',
+            ExpressionAttributeValues: {
+                ':phone': patientPhone
+            }
+        });
 
         const response = await docClient.send(command);
 

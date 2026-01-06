@@ -44,26 +44,12 @@
             <div id="resultsSection" class="section hidden">
                 <div class="card">
                     <div class="user-info">
-                        <span>Kirgan: <strong id="userName"></strong></span>
-                        <button id="logoutBtn" class="logout-btn">Chiqish</button>
+                        <span data-i18n="loggedInAs">Kirgan:</span> <strong id="userName"></strong>
+                        <button id="logoutBtn" class="logout-btn" data-i18n="logout">Chiqish</button>
                     </div>
                 </div>
 
-                <div class="card">
-                    <h2 data-i18n="searchResults">Natijalarni qidirish</h2>
-                    <form id="searchForm">
-                        <div class="form-group">
-                            <label for="patientPhone" data-i18n="patientPhone">Bemor telefon raqami:</label>
-                            <input type="tel" id="patientPhone" name="patientPhone" required
-                                   data-i18n-placeholder="phonePlaceholder" placeholder="+1234567890">
-                        </div>
-                        <div class="form-group">
-                            <label for="date" data-i18n="dateOptional">Sana (ixtiyoriy):</label>
-                            <input type="date" id="date" name="date">
-                        </div>
-                        <button type="submit" data-i18n="search">Qidirish</button>
-                    </form>
-                </div>
+
                 
                 <div id="resultsContainer" class="card hidden">
                     <h2 data-i18n="results">Natijalar</h2>

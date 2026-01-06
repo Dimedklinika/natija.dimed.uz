@@ -106,6 +106,9 @@ function showResults() {
     document.getElementById('loginSection').classList.add('hidden');
     document.getElementById('resultsSection').classList.remove('hidden');
     document.getElementById('userName').textContent = session.name || session.phone || 'User';
+
+    // Load user's results automatically
+    loadUserResults();
 }
 
 // Initialize - check if user is logged in
