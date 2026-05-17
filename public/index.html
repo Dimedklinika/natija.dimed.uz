@@ -27,7 +27,7 @@
             <div id="loginSection" class="section">
                 <div class="card">
                     <h2 data-i18n="login">Kirish</h2>
-                    <p class="instructions" data-i18n="loginInstructions">Telegram botga xabar yuboring va tasdiqlash kodini oling, keyin uni quyida kiriting.</p>
+                    <p class="instructions" data-i18n-html="loginInstructions">Telegram botga xabar yuboring va tasdiqlash kodini oling, keyin uni quyida kiriting.</p>
                     <form id="loginForm">
                         <div class="form-group">
                             <label for="verificationCode" data-i18n="verificationCode">Tasdiqlash kodi:</label>
@@ -44,17 +44,15 @@
             <div id="resultsSection" class="section hidden">
                 <div class="card">
                     <div class="user-info">
-                        <span data-i18n="loggedInAs">Kirgan:</span> <strong id="userName"></strong>
+                        <span data-i18n="loggedInAs">Kirgan:</span> <span id="userName"></span>
                         <button id="logoutBtn" class="logout-btn" data-i18n="logout">Chiqish</button>
                     </div>
                 </div>
 
-
-                
                 <div id="resultsContainer" class="card hidden">
                     <h2 data-i18n="results">Natijalar</h2>
                     <div id="resultsList"></div>
-                </div>
+                </div> 
                 
                 <div id="errorMessage" class="error hidden"></div>
             </div>
