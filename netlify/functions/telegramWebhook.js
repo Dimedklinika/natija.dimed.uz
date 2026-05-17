@@ -1,7 +1,7 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, UpdateCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
-const REGION = process.env.AWS_REGION || process.env.MY_AWS_REGION || 'us-east-1';
+const REGION = process.env.MY_AWS_REGION || 'us-east-1';
 
 const client = new DynamoDBClient({
     region: REGION,

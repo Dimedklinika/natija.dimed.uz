@@ -1,8 +1,7 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
-const REGION = process.env.AWS_REGION || process.env.MY_AWS_REGION || 'us-east-1';
-const TABLE_NAME = process.env.AWS_DYNAMODB_TABLE || 'AnalysisResult';
+const REGION = process.env.MY_AWS_REGION || 'us-east-1';
 
 const client = new DynamoDBClient({
     region: REGION,
