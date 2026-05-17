@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, QueryCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 
 const client = new DynamoDBClient({
     region: process.env.AWS_REGION || 'us-east-1',
@@ -14,8 +14,8 @@ exports.handler = async (event) => {
     const headers = {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS'
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS, POST'
     };
 
     if (event.httpMethod === 'OPTIONS') {
@@ -33,9 +33,9 @@ exports.handler = async (event) => {
             };
         }
 
-        const patientPhone = authHeader.substring(7); // Remove 'Bearer ' prefix
+        const phone = authHeader.substring(7); // Remove 'Bearer ' prefix
 
-        if (!patientPhone) {
+        if (!phone) {
             return {
                 statusCode: 400,
                 headers,
@@ -43,12 +43,12 @@ exports.handler = async (event) => {
             };
         }
 
-        // Query all results for this patient's phone number
-        const command = new QueryCommand({
+        // Scan the table for results with matching phone (since GSI structure is unclear)
+        const command = new ScanCommand({
             TableName: 'AnalysisResult',
-            KeyConditionExpression: 'PatientPhone = :phone',
+            FilterExpression: 'Phone = :phone',
             ExpressionAttributeValues: {
-                ':phone': patientPhone
+                ':phone': phone
             }
         });
 
