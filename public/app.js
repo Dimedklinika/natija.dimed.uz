@@ -31,6 +31,12 @@ function t(key) {
 
 // Update all elements with data-i18n attributes
 function updateLanguage() {
+    // Update HTML content (allows translations with HTML, e.g., links)
+    document.querySelectorAll('[data-i18n-html]').forEach(element => {
+        const key = element.getAttribute('data-i18n-html');
+        element.innerHTML = t(key);
+    });
+
     // Update text content
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
@@ -96,6 +102,44 @@ function showLogin() {
     document.getElementById('resultsSection').classList.add('hidden');
 }
 
+async function loadUserResults() {
+    const session = getSession();
+    if (!session || !session.phone) {
+        console.error('No session or phone number available');
+        return;
+    }
+
+    const resultsList = document.getElementById('resultsList');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const errorDiv = document.getElementById('errorMessage');
+
+    try {
+        errorDiv.classList.add('hidden');
+
+        const response = await fetch(`${API_BASE}/getResults`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.phone}` // Use session phone as auth token
+            },
+            body: JSON.stringify({ Phone: session.phone, date: null })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch results');
+        }
+
+        const results = await response.json();
+        displayResults(results);
+
+    } catch (error) {
+        errorDiv.textContent = `Error: ${error.message}`;
+        errorDiv.classList.remove('hidden');
+        resultsList.innerHTML = '';
+    }
+}
+
 function showResults() {
     const session = getSession();
     if (!session) {
@@ -105,7 +149,11 @@ function showResults() {
 
     document.getElementById('loginSection').classList.add('hidden');
     document.getElementById('resultsSection').classList.remove('hidden');
-    document.getElementById('userName').textContent = session.name || session.phone || 'User';
+    document.getElementById('userName').textContent = session.name || 'User';
+
+    if (session.phone) {
+      document.getElementById('userName').textContent += ` (${session.phone})`;
+    }
 
     // Load user's results automatically
     loadUserResults();
@@ -119,125 +167,35 @@ if (session) {
     showLogin();
 }
 
-// Login form handler
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const code = document.getElementById('verificationCode').value.trim();
-    const errorDiv = document.getElementById('loginError');
-    
-    errorDiv.classList.add('hidden');
-    
-    if (!code || code.length !== 6) {
-        errorDiv.textContent = t('invalidCode');
-        errorDiv.classList.remove('hidden');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_BASE}/verifyLogin`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code })
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || 'Verification failed');
-        }
-        
-        if (data.success && data.user) {
-            setSession(data.user);
-            showResults();
-            document.getElementById('verificationCode').value = '';
-        } else {
-            throw new Error('Invalid response from server');
-        }
-        
-    } catch (error) {
-        errorDiv.textContent = `Error: ${error.message}`;
-        errorDiv.classList.remove('hidden');
-    }
-});
-
-// Logout handler
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    clearSession();
-    showLogin();
-});
-
-// Search form handler
-document.getElementById('searchForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const phone = document.getElementById('patientPhone').value;
-    const date = document.getElementById('date').value;
-    
-    const errorDiv = document.getElementById('errorMessage');
-    const resultsContainer = document.getElementById('resultsContainer');
-    const resultsList = document.getElementById('resultsList');
-    
-    errorDiv.classList.add('hidden');
-    resultsContainer.classList.add('hidden');
-    resultsList.innerHTML = '<div class="loading">Loading...</div>';
-    
-    try {
-        const response = await fetch(`${API_BASE}/getResults`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ patientPhone: phone, date: date || null })
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to fetch results');
-        }
-        
-        const results = await response.json();
-        displayResults(results);
-        
-    } catch (error) {
-        errorDiv.textContent = `Error: ${error.message}`;
-        errorDiv.classList.remove('hidden');
-        resultsList.innerHTML = '';
-    }
-});
-
 function displayResults(results) {
     const container = document.getElementById('resultsContainer');
     const list = document.getElementById('resultsList');
-    
+
     if (!results || results.length === 0) {
-        list.innerHTML = '<p class="no-results">No results found.</p>';
+        list.innerHTML = '<p data-i18n="no-results" class="no-results">Natijalar topilmadi.</p>';
         container.classList.remove('hidden');
         return;
     }
-    
-    list.innerHTML = results.map(result => `
-        <div class="result-card">
-            <div class="result-header">
-                <h3>Result #${escapeHtml(result.Number || 'N/A')}</h3>
-                <div class="result-date">${escapeHtml(result.date || 'N/A')}</div>
-            </div>
-            <div class="result-body">
-                <div class="result-field">
-                    <strong>Patient Phone:</strong> ${escapeHtml(result.PatientPhone || 'N/A')}
-                </div>
-                ${result.Patient ? `<div class="result-field"><strong>Patient:</strong> ${escapeHtml(String(result.Patient))}</div>` : ''}
-                ${result.BiomaterialCollectTime ? `<div class="result-field"><strong>Biomaterial Collection Time:</strong> ${escapeHtml(String(result.BiomaterialCollectTime))}</div>` : ''}
-                ${result.Biomaterial ? `<div class="result-field"><strong>Biomaterial:</strong> ${escapeHtml(String(result.Biomaterial))}</div>` : ''}
-                ${result.AnalysisTime ? `<div class="result-field"><strong>Analysis Time:</strong> ${escapeHtml(String(result.AnalysisTime))}</div>` : ''}
-                ${result.AccomplishedBy ? `<div class="result-field"><strong>Accomplished By:</strong> ${escapeHtml(String(result.AccomplishedBy))}</div>` : ''}
-                ${result.Analysis ? `<div class="result-field"><strong>Analysis:</strong> ${escapeHtml(String(result.Analysis))}</div>` : ''}
-                ${result.RawComputerResults ? `<div class="result-field"><strong>Raw Computer Results:</strong> <pre>${escapeHtml(JSON.stringify(result.RawComputerResults, null, 2))}</pre></div>` : ''}
-                ${result.AnalysisResults ? `<div class="result-field"><strong>Analysis Results:</strong> <pre>${escapeHtml(JSON.stringify(result.AnalysisResults, null, 2))}</pre></div>` : ''}
-            </div>
-        </div>
-    `).join('');
-    
+
+    // Store results globally for access in click handlers
+    window.currentResults = results;
+
+    const itemsHtml = results.map((result, idx) => {
+        const documentUID = result.DocumentUID || `result-${idx}`;
+        const label = escapeHtml(result.PatientName || `Natija ${idx + 1}`);
+        const dateText = escapeHtml(result.Date || result.RegisteredDate || result.CompletedDate || 'Sanasiz');
+        const resultUrl = `/result/${encodeURIComponent(documentUID)}`;
+        return `
+            <li class="result-item">
+                <a class="result-link-item" href="${resultUrl}">${label} (${dateText})</a>
+            </li>
+        `;
+    }).join('');
+
+    list.innerHTML = `<ul class="result-link-list">${itemsHtml}</ul>`;
     container.classList.remove('hidden');
 }
+
 
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -246,10 +204,75 @@ function escapeHtml(text) {
 }
 
 // Initialize multi-language support
-document.addEventListener('DOMContentLoaded', () => {
+// Check if DOM is already loaded and initialize immediately if so
+function initializeApp() {
+    console.log('Initializing app...');
     initLanguage();
     initLanguageSelector();
-});
+    
+    // Add event listeners after DOM is loaded
+    // Login form handler
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const code = document.getElementById('verificationCode').value.trim();
+            const errorDiv = document.getElementById('loginError');
+            
+            errorDiv.classList.add('hidden');
+            
+            if (!code || code.length !== 6) {
+                errorDiv.textContent = t('invalidCode');
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/verifyLogin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Verification failed');
+                }
+                
+                if (data.success && data.user) {
+                    setSession(data.user);
+                    showResults();
+                    document.getElementById('verificationCode').value = '';
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+                
+            } catch (error) {
+                errorDiv.textContent = `Error: ${error.message}`;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Logout handler
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            clearSession();
+            showLogin();
+        });
+    }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    // DOM already loaded (this script is at the end of body)
+    initializeApp();
+}
 
 
 
