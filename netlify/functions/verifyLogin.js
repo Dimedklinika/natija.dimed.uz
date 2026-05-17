@@ -1,8 +1,10 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, ScanCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 
+const REGION = process.env.AWS_REGION || process.env.MY_AWS_REGION || 'us-east-1';
+
 const client = new DynamoDBClient({
-    region: process.env.MY_AWS_REGION || 'us-east-1',
+    region: REGION,
     credentials: {
         accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY

@@ -1,8 +1,11 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, QueryCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 
+const REGION = process.env.AWS_REGION || process.env.MY_AWS_REGION || 'us-east-1';
+const TABLE_NAME = process.env.AWS_DYNAMODB_TABLE || 'AnalysisResult';
+
 const client = new DynamoDBClient({
-    region: process.env.AWS_REGION || 'us-east-1',
+    region: REGION,
     credentials: {
         accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY
@@ -45,7 +48,7 @@ exports.handler = async (event) => {
 
         // Scan the table for results with matching phone (since GSI structure is unclear)
         const command = new ScanCommand({
-            TableName: 'AnalysisResult',
+            TableName: TABLE_NAME,
             FilterExpression: 'Phone = :phone',
             ExpressionAttributeValues: {
                 ':phone': phone

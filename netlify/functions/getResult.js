@@ -1,8 +1,11 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
+const REGION = process.env.AWS_REGION || process.env.MY_AWS_REGION || 'us-east-1';
+const TABLE_NAME = process.env.AWS_DYNAMODB_TABLE || 'AnalysisResult';
+
 const client = new DynamoDBClient({
-    region: process.env.AWS_REGION || 'us-east-1',
+    region: REGION,
     credentials: {
         accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY
@@ -48,7 +51,7 @@ exports.handler = async (event) => {
         // Get the specific result by DocumentUID (partition key)
         // Since DocumentUID is unique, we'll query and return the first result
         const command = new QueryCommand({
-            TableName: 'AnalysisResult',
+            TableName: TABLE_NAME,
             KeyConditionExpression: 'DocumentUID = :documentUID',
             ExpressionAttributeValues: {
                 ':documentUID': documentUID
