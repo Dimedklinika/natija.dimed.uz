@@ -50,7 +50,7 @@ exports.handler = async (event) => {
         // Get the specific result by DocumentUID (partition key)
         // Since DocumentUID is unique, we'll query and return the first result
         const command = new QueryCommand({
-            TableName: TABLE_NAME,
+            TableName: 'AnalysisResult',
             KeyConditionExpression: 'DocumentUID = :documentUID',
             ExpressionAttributeValues: {
                 ':documentUID': documentUID

@@ -47,7 +47,7 @@ exports.handler = async (event) => {
 
         // Scan the table for results with matching phone (since GSI structure is unclear)
         const command = new ScanCommand({
-            TableName: TABLE_NAME,
+            TableName: 'AnalysisResult',
             FilterExpression: 'Phone = :phone',
             ExpressionAttributeValues: {
                 ':phone': phone
