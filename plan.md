@@ -34,8 +34,8 @@ The application uses vanilla HTML/CSS/JavaScript frontend with Netlify Functions
 
 1. **AnalysisResult** (existing)
 
-- Partition Key: `PatientPhone` (String)
-- Sort Key: `date` (String)
+- Partition Key: `DocumentUID` (String)
+- Sort Key: `Date` (String)
 - Attributes: Number, Patient, BiomaterialCollectTime, Biomaterial, AnalysisTime, AccomplishedBy, RawComputerResults, Analysis, AnalysisResults, etc.
 
 2. **UserVerification** (new)
@@ -51,7 +51,7 @@ The application uses vanilla HTML/CSS/JavaScript frontend with Netlify Functions
 
 - Receives POST requests from Telegram
 - Extracts Telegram user ID, phone number, and name from message
-- Generates 6-digit verification code
+- Generates unique (unexpired in UserVerification table) 6-digit verification code
 - Updates or creates user record in UserVerification table (by telegramUserId)
 - Sets code, codeCreatedAt, and codeTTL attributes (codeTTL = current time + 120 seconds)
 - Sends code back to user via Telegram Bot API
@@ -70,10 +70,15 @@ The application uses vanilla HTML/CSS/JavaScript frontend with Netlify Functions
 
 ### 3. `getResults.js`
 
-- Queries AnalysisResult table by PatientPhone
+- Queries AnalysisResult table by Phone
 - Optional date filter
 - Returns array of results
 - **Endpoint:** `/.netlify/functions/getResults`
+
+### 4. `getResult.js`
+
+- Show single AnalysisResult 
+- **Endpoint:** `/.netlify/functions/getResult`
 
 ## Frontend Files
 
