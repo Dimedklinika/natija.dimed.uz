@@ -1,3 +1,5 @@
+const API_BASE = '/.netlify/functions';
+
 async function loadResult() {
     const container = document.getElementById('resultContainer');
     const pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -9,7 +11,7 @@ async function loadResult() {
     }
 
     try {
-        const response = await fetch(`/api/getResult/${encodeURIComponent(documentUID)}`);
+        const response = await fetch(`${API_BASE}/getResult/${encodeURIComponent(documentUID)}`);
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Failed to fetch result');
