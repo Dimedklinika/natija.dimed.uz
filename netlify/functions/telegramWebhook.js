@@ -3,6 +3,13 @@ const { DynamoDBDocumentClient, UpdateCommand, QueryCommand } = require('@aws-sd
 
 const REGION = process.env.MY_AWS_REGION || 'us-east-1';
 
+// Normalize phone number to always include + prefix
+function normalizePhone(phone) {
+    if (!phone) return '';
+    const cleaned = String(phone).replace(/\D/g, '');
+    return cleaned.startsWith('+') ? cleaned : '+' + cleaned;
+}
+
 const client = new DynamoDBClient({
     region: REGION,
     credentials: {
@@ -47,7 +54,7 @@ exports.handler = async (event) => {
         // Check if user shared contact
         let phone = '';
         if (update.message.contact && update.message.contact.phone_number) {
-            phone = update.message.contact.phone_number;
+            phone = normalizePhone(update.message.contact.phone_number);
         }
 
         // First, check if user has an existing record

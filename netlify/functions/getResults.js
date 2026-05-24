@@ -3,6 +3,13 @@ const { DynamoDBDocumentClient, QueryCommand, ScanCommand } = require('@aws-sdk/
 
 const REGION = process.env.MY_AWS_REGION || 'us-east-1';
 
+// Normalize phone number to always include + prefix
+function normalizePhone(phone) {
+    if (!phone) return '';
+    const cleaned = String(phone).replace(/\D/g, '');
+    return cleaned.startsWith('+') ? cleaned : '+' + cleaned;
+}
+
 const client = new DynamoDBClient({
     region: REGION,
     credentials: {
@@ -35,7 +42,8 @@ exports.handler = async (event) => {
             };
         }
 
-        const phone = authHeader.substring(7); // Remove 'Bearer ' prefix
+        let phone = authHeader.substring(7); // Remove 'Bearer ' prefix
+        phone = normalizePhone(phone);
 
         if (!phone) {
             return {
